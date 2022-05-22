@@ -1,0 +1,23 @@
+{
+  "name": "wikipedia_random_walk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cygra/wikipedia_random_walk.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Cygra/wikipedia_random_walk/issues"
+  },
+  "homepage": "https://github.com/Cygra/wikipedia_random_walk#readme",
+  "dependencies": {
+    "puppeteer": "^14.1.1"
+  }
+}
