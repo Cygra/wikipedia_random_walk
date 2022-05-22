@@ -38,18 +38,34 @@
                 name: "Wikipedia Random Walk",
                 type: "graph",
                 layout: "force",
-                data: graph.nodes.map((it) => ({ id: it, name: it })),
+                data: graph.nodes.map((it) => ({
+                  id: it,
+                  name: it,
+                  symbolSize: Math.max(
+                    (graph.links.filter(({ target }) => target === it).length /
+                      graph.links.length) *
+                      1000,
+                    10
+                  ),
+                })),
                 links: graph.links,
                 roam: true,
                 label: {
                   position: "right",
-                  show: true,
+                },
+                emphasis: {
+                  focus: "adjacency",
+                  label: {
+                    position: "right",
+                    show: true,
+                  },
                 },
                 force: {
-                  repulsion: 200,
+                  repulsion: 500,
                   initLayout: "circular",
                 },
                 edgeSymbol: ["", "arrow"],
+                draggable: true,
               },
             ],
           };
