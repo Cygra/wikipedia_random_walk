@@ -29,43 +29,38 @@
       myChart.showLoading();
       $.get(
         "https://raw.githubusercontent.com/cygra/wikipedia_random_walk/master/data.json",
-        function (graph) {
-          graph = JSON.parse(graph);
+        function (data) {
+          data = JSON.parse(data);
           myChart.hideLoading();
           option = {
+            tooltip: {
+              trigger: "item",
+              triggerOn: "mousemove",
+            },
             series: [
               {
-                name: "Wikipedia Random Walk",
-                type: "graph",
-                layout: "force",
-                data: graph.nodes.map((it) => ({
-                  id: it,
-                  name: it,
-                  symbolSize: Math.max(
-                    (graph.links.filter(({ target }) => target === it).length /
-                      graph.links.length) *
-                      500,
-                    10
-                  ),
-                })),
-                links: graph.links,
-                roam: true,
+                type: "tree",
+                data: [data],
+                top: "1%",
+                left: "15%",
+                bottom: "1%",
+                right: "7%",
+                symbolSize: 7,
+                orient: "RL",
                 label: {
                   position: "right",
+                  verticalAlign: "middle",
+                  align: "left",
                 },
                 emphasis: {
-                  focus: "adjacency",
-                  label: {
-                    position: "right",
-                    show: true,
-                  },
+                  focus: "descendant",
                 },
-                force: {
-                  repulsion: 500,
-                  initLayout: "circular",
+                label: {
+                  show: false,
                 },
-                edgeSymbol: ["", "arrow"],
-                draggable: true,
+                animationDuration: 550,
+                animationDurationUpdate: 750,
+                initialTreeDepth: -1,
               },
             ],
           };

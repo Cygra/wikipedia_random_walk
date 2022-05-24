@@ -17,14 +17,10 @@ const findFirstLink = async (p) => {
 
 const hrefs = [];
 
-const loop = async (p, targetUrl, nodes, links) => {
+const loop = async (p, targetUrl) => {
   await p.goto(targetUrl || `${prefix}Special:Random`);
 
   let title = getUrlTitle(targetUrl || p.url());
-
-  if (!nodes.includes(title)) {
-    nodes.push(title);
-  }
 
   const targetHref = await findFirstLink(p);
 
@@ -32,28 +28,38 @@ const loop = async (p, targetUrl, nodes, links) => {
   const targetUrlTitle = getUrlTitle(targetHref);
   console.log(`from: ${title} to: ${targetUrlTitle}`);
 
-  links.push({
-    source: title,
-    target: targetUrlTitle,
-  });
-
   if (hrefs.includes(targetHref) || hrefs.length === 50) {
     return;
   } else {
-    hrefs.push(targetHref);
-    await loop(p, targetHref, nodes, links);
+    hrefs.unshift(targetHref);
+    await loop(p, targetHref);
   }
 };
 
-fs.readFile("./data.json", async (err, data) => {
+fs.readFile("./tree.json", async (err, data) => {
   if (err) throw err;
-  const { nodes, links } = JSON.parse(data.toString());
+  const json = JSON.parse(data.toString());
   const browser = await puppeteer.launch();
 
   const page = await browser.newPage();
-  await loop(page, "", nodes, links);
+  await loop(page, "");
 
-  fs.writeFile(`./data.json`, JSON.stringify({ nodes, links }), (err) => {
+  console.log(hrefs.map(getUrlTitle));
+
+  let current = json;
+  hrefs.forEach((it) => {
+    const title = getUrlTitle(it);
+    const match = current.children.find((cur) => cur.name === title);
+    if (match) {
+      current = match;
+    } else {
+      const child = { name: title, children: [] };
+      current.children.push(child);
+      current = child;
+    }
+  });
+
+  fs.writeFile(`./tree.json`, JSON.stringify(json), (err) => {
     if (err) throw err;
     console.log("data updated");
   });
