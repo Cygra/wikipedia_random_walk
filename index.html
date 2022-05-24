@@ -28,7 +28,7 @@
 
       myChart.showLoading();
       $.get(
-        "https://raw.githubusercontent.com/cygra/wikipedia_random_walk/master/data.json",
+        "https://raw.githubusercontent.com/cygra/wikipedia_random_walk/master/tree.json",
         function (data) {
           data = JSON.parse(data);
           myChart.hideLoading();
