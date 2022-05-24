@@ -3,8 +3,21 @@ const fs = require("fs");
 
 const prefix = "https://en.wikipedia.org/wiki/";
 
-const getUrlTitle = (href) =>
-  decodeURIComponent(href.replace(prefix, "").split("#")[0]);
+const getUrlTitle = (href) => {
+  let result = decodeURIComponent(href.replace(prefix, "").split("#")[0]);
+  if (
+    [
+      "Latin",
+      "Communication",
+      "Language",
+      "Classical_language",
+      "Latin_language",
+    ].includes(result)
+  ) {
+    result = `Latin, Communication Language, Classical_language, Latin_language`;
+  }
+  return result;
+};
 
 const findFirstLink = async (p) => {
   await p.waitForSelector(`#bodyContent`);
@@ -17,21 +30,24 @@ const findFirstLink = async (p) => {
 
 const hrefs = [];
 
-const loop = async (p, targetUrl) => {
-  await p.goto(targetUrl || `${prefix}Special:Random`);
-
-  let title = getUrlTitle(targetUrl || p.url());
+const loop = async (p, currentUrl) => {
+  await p.goto(currentUrl || `${prefix}Special:Random`);
 
   const targetHref = await findFirstLink(p);
 
   if (!targetHref) return;
-  const targetUrlTitle = getUrlTitle(targetHref);
-  console.log(`from: ${title} to: ${targetUrlTitle}`);
 
-  if (hrefs.includes(targetHref) || hrefs.length === 50) {
+  let result = getUrlTitle(targetHref);
+
+  if (hrefs.includes(result) || hrefs.length === 50) {
     return;
   } else {
-    hrefs.unshift(targetHref);
+    console.log(
+      `from: ${getUrlTitle(currentUrl || p.url())} to: ${getUrlTitle(
+        targetHref
+      )}`
+    );
+    hrefs.unshift(result);
     await loop(p, targetHref);
   }
 };
@@ -44,16 +60,13 @@ fs.readFile("./tree.json", async (err, data) => {
   const page = await browser.newPage();
   await loop(page, "");
 
-  console.log(hrefs.map(getUrlTitle));
-
   let current = json;
   hrefs.forEach((it) => {
-    const title = getUrlTitle(it);
-    const match = current.children.find((cur) => cur.name === title);
+    const match = current.children.find((cur) => cur.name === it);
     if (match) {
       current = match;
     } else {
-      const child = { name: title, children: [] };
+      const child = { name: it, children: [] };
       current.children.push(child);
       current = child;
     }

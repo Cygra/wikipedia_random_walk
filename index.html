@@ -71,6 +71,15 @@
             ],
           };
           myChart.setOption(option);
+          myChart.on("click", "series.tree", ({ name }) => {
+            if (
+              name ===
+              `Latin, Communication Language, Classical_language, Latin_language`
+            ) {
+              name = "Latin";
+            }
+            window.open(`https://en.wikipedia.org/wiki/${name}`);
+          });
         }
       );
 
