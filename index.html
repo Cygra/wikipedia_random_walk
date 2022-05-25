@@ -67,18 +67,23 @@
                 animationDuration: 550,
                 animationDurationUpdate: 750,
                 initialTreeDepth: -1,
+                expandAndCollapse: false,
               },
             ],
           };
           myChart.setOption(option);
-          myChart.on("click", "series.tree", ({ name }) => {
+          myChart.on("click", "series.tree", (e) => {
+            if (e.event.target.culling) {
+              return;
+            }
             if (
-              name ===
+              e.name ===
               `Latin, Communication Language, Classical_language, Latin_language`
             ) {
-              name = "Latin";
+              window.open(`https://en.wikipedia.org/wiki/Latin`);
+            } else {
+              window.open(`https://en.wikipedia.org/wiki/${e.name}`);
             }
-            window.open(`https://en.wikipedia.org/wiki/${name}`);
           });
         }
       );
